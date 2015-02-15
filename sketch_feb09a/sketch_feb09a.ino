@@ -22,6 +22,65 @@ class RGBPixel
     uint8_t blue;
 };
 
+class HSVPixel
+{
+  public:
+    uint8_t hue;
+    uint8_t saturation;
+    uint8_t value;
+
+    void loadTo(RGBPixel *pix) {
+      int i;
+      float f, p, q, t;
+
+      if ( saturation == 0 ) {
+        // achromatic (grey)
+        pix->red = pix->green = pix->blue = value;
+        return;
+      }
+
+      hue /= 60;			// sector 0 to 5
+      i = floor( hue );
+      f = hue - i;			// factorial part of h
+      p = value * ( 1 - saturation );
+      q = value * ( 1 - saturation * f );
+      t = value * ( 1 - saturation * ( 1 - f ) );
+
+      switch ( i ) {
+        case 0:
+          pix->red = value;
+          pix->green = t;
+          pix->blue = p;
+          break;
+        case 1:
+          pix->red = q;
+          pix->green = value;
+          pix->blue = p;
+          break;
+        case 2:
+          pix->red = p;
+          pix->green = value;
+          pix->blue = t;
+          break;
+        case 3:
+          pix->red = p;
+          pix->green = q;
+          pix->blue = value;
+          break;
+        case 4:
+          pix->red = t;
+          pix->green = p;
+          pix->blue = value;
+          break;
+        default:		// case 5:
+          pix->red = value;
+          pix->green = p;
+          pix->blue = q;
+          break;
+      }
+    }
+};
+
 const float seaLevelPressure PROGMEM = SENSORS_PRESSURE_SEALEVELHPA;
 const int maxAcceleration PROGMEM = 10;
 Adafruit_10DOF dof = Adafruit_10DOF();
@@ -61,11 +120,28 @@ void pulse(int x, sensors_event_t *event, sensors_event_t *previous_event)
   int8_t y_delta = abs(event->acceleration.y - previous_event->acceleration.y);
   int8_t z_delta = abs(event->acceleration.z - previous_event->acceleration.z);
 
+  RGBPixel * p = &frame[x];
+
   avg_color(x,
             map(x_delta, 0, maxAcceleration, 0, 255),
+            p->green,
+            p->blue
+           );
+
+  p = &frame[0];
+  avg_color(0,
+            p->red,
             map(y_delta, 0, maxAcceleration, 0, 255),
+            p->blue
+           );
+
+  p = &frame[NUM_PIXELS - 1];
+  avg_color(NUM_PIXELS - 1,
+            p->red,
+            p->green,
             map(z_delta, 0, maxAcceleration, 0, 255)
            );
+
 }
 
 void loop() {
