@@ -96,22 +96,29 @@ bool which = false;
 #define NUM_PIXELS 8
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_PIXELS, PIN, NEO_GRB + NEO_KHZ800);
 RGBPixel frame[NUM_PIXELS];
+HSVPixel hsvpix;
+RGBPixel rgbpix;
 
 void setup() {
-  Serial.begin(115200);
   strip.begin();
+  strip.setBrightness(128);
   strip.show();
 
   // Init Sensors
   bool successful = accel.begin() && mag.begin() && bmp.begin();
 
   if (!successful) {
-    Serial.println("Check your wiring!");
-    strip.setPixelColor(4, 128, 0, 0);
-    strip.show();
-    while (1);
+    while (1) {
+      strip.setPixelColor(3, 0, 0 , 0);
+      strip.setPixelColor(4, 128, 0, 0);
+      strip.show();
+      delay(500);
+      strip.setPixelColor(3, 128, 0, 0);
+      strip.setPixelColor(4, 0, 0, 0);
+      strip.show();
+      delay(500);
+    }
   }
-  Serial.println("Beginning");
 }
 
 void pulse(int x, sensors_event_t *event, sensors_event_t *previous_event)
@@ -120,28 +127,17 @@ void pulse(int x, sensors_event_t *event, sensors_event_t *previous_event)
   int8_t y_delta = abs(event->acceleration.y - previous_event->acceleration.y);
   int8_t z_delta = abs(event->acceleration.z - previous_event->acceleration.z);
 
-  RGBPixel * p = &frame[x];
+  hsvpix.hue = map(x_delta, 0, maxAcceleration, 0, 255);
+  hsvpix.value = map(y_delta, 0, maxAcceleration, 0, 255);
+  hsvpix.saturation = map(z_delta, 0, maxAcceleration, 0, 255);
+
+  hsvpix.loadTo(&rgbpix);
 
   avg_color(x,
-            map(x_delta, 0, maxAcceleration, 0, 255),
-            p->green,
-            p->blue
+            rgbpix.red,
+            rgbpix.green,
+            rgbpix.blue
            );
-
-  p = &frame[0];
-  avg_color(0,
-            p->red,
-            map(y_delta, 0, maxAcceleration, 0, 255),
-            p->blue
-           );
-
-  p = &frame[NUM_PIXELS - 1];
-  avg_color(NUM_PIXELS - 1,
-            p->red,
-            p->green,
-            map(z_delta, 0, maxAcceleration, 0, 255)
-           );
-
 }
 
 void loop() {
@@ -150,9 +146,6 @@ void loop() {
   mag.getEvent(&mag_event);
 
   if (dof.fusionGetOrientation(event, &mag_event, &orientation)) {
-    Serial.print("X: "); Serial.print(event->acceleration.x); Serial.print(", ");
-    Serial.print("Y: "); Serial.print(event->acceleration.y); Serial.print(", ");
-    Serial.print("Z: "); Serial.println(event->acceleration.z);
 
     if (which) {
       pulse(3, &accel_event_1, &accel_event_2);
