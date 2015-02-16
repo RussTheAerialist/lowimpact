@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+
+BASEPROJECT=sketch_feb09a
+
+if [ -z "$1" ]; then
+    echo "usage: $0 [project]"
+    exit 1
+fi
+
+BASENAME=$(basename $1)
+
+if [ ! -e $1 ]; then
+    mkdir $1 2> /dev/null
+fi
+
+if [ ! -e $1/$BASENAME.ino ]; then
+    cp $BASEPROJECT/$BASEPROJECT.ino $1/$BASENAME.ino 2> /dev/null
+fi
+
+FILES=$(find common -name "*.cpp" && find common -name "*.h")
+
+for file in $FILES
+do
+   BASE=$(basename $file)
+   echo $BASE
+   (cd $1 && ln -s ../$file $BASE) 2> /dev/null
+done
+
