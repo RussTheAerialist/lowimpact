@@ -22,6 +22,27 @@ void hsv_pulse(RGBPixel &pixel, uint8_t x_delta, uint8_t y_delta, uint8_t z_delt
            );
 }
 
+void rgb_3_pulse(RGBPixel &frame0, RGBPixel &frame1, RGBPixel &frame2, uint8_t x_delta, uint8_t y_delta, uint8_t z_delta) {
+
+  avg_color(frame0,
+            map_accel(x_delta, 255),
+            frame0.green,
+            frame0.blue
+           );
+
+  avg_color(frame0,
+            frame1.red,
+            map_accel(y_delta, 255),
+            frame1.blue
+           );
+
+  avg_color(frame0,
+            frame2.red,
+            frame2.green,
+            map_accel(z_delta, 255)
+           );
+}
+
 void avg_color(RGBPixel &pixel,
                       uint8_t r,
                       uint8_t g,
