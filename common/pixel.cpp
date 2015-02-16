@@ -1,3 +1,7 @@
+#include <stdint.h>
+#include <math.h>
+#include "pixel.h"
+
 void HSVPixel::loadTo(RGBPixel *pix) {
       int i;
       float f, p, q, t;
