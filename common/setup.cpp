@@ -1,5 +1,6 @@
 #include "arduino.h"
 #include "setup.h"
+#include "programs.h"
 
 #include <Adafruit_NeoPixel.h>
 #include <Adafruit_BMP085_U.h>
@@ -7,8 +8,8 @@
 #include <Adafruit_L3GD20_U.h>
 #include <Adafruit_Sensor.h>
 
-static void display_program(Adafruit_NeoPixel &strip, int program_number) {
-  for(int i=0; i<strip.numPixels() && program_number > 0; i++) {
+static void display_program(Adafruit_NeoPixel &strip, uint8_t program_number) {
+  for(uint16_t i=0; i<strip.numPixels() && program_number > 0; i++) {
     if (program_number & 0x01) {
       strip.setPixelColor(i, 64, 64, 64);
     } else {
@@ -29,7 +30,7 @@ void common_setup(
        Adafruit_LSM303_Accel_Unified &accel,
        Adafruit_LSM303_Mag_Unified &mag,
        Adafruit_BMP085_Unified &bmp,
-       int program_number 
+       Programs program_number 
 ) {
   strip.begin();
   // strip.setBrightness(128);
@@ -51,8 +52,8 @@ void common_setup(
     }
   }
 
-  if (program_number > 0) {
-    display_program(strip, program_number);
+  if (program_number != Programs::undefined) {
+    display_program(strip, static_cast<uint8_t>(program_number));
   }
 }
 
