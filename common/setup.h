@@ -10,6 +10,16 @@
 #include <Adafruit_10DOF.h>
 #include <stdint.h>
 
+////////////////////////////////////
+// Configuration Section
+////////////////////////////////////
+
+#define PIN 6
+#define NUM_PIXELS 8
+#define AVERAGE_FACTOR 4
+
+////////////////////////////////////
+
 void common_setup(Adafruit_NeoPixel &strip,
        Adafruit_LSM303_Accel_Unified &accel,
        Adafruit_LSM303_Mag_Unified &mag,

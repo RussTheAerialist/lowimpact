@@ -19,9 +19,6 @@
 #include "pixel.h"
 #include "programs.h"
 
-#define PIN 6
-#define NUM_PIXELS 8
-
 const float seaLevelPressure PROGMEM = SENSORS_PRESSURE_SEALEVELHPA;
 const int maxAcceleration PROGMEM = 10;
 Adafruit_10DOF dof = Adafruit_10DOF();

@@ -1,8 +1,10 @@
 #include <stdint.h>
 #include "arduino.h"
+#include <Adafruit_Neopixel.h>
 #include "pixel.h"
 #include "accel.h"
 #include "color.h"
+#include "setup.h"
 
 void hsv_pulse(RGBPixel &pixel, uint8_t x_delta, uint8_t y_delta, uint8_t z_delta)
 {
@@ -30,13 +32,13 @@ void rgb_3_pulse(RGBPixel &frame0, RGBPixel &frame1, RGBPixel &frame2, uint8_t x
             frame0.blue
            );
 
-  avg_color(frame0,
+  avg_color(frame1,
             frame1.red,
             map_accel(y_delta, 255),
             frame1.blue
            );
 
-  avg_color(frame0,
+  avg_color(frame2,
             frame2.red,
             frame2.green,
             map_accel(z_delta, 255)
@@ -56,9 +58,9 @@ void avg_color(RGBPixel &pixel,
                       uint8_t b
                      )
 {
-  r = (pixel.red * 3 + r) / 4;
-  g = (pixel.green * 3 + g) / 4;
-  b = (pixel.blue * 3 + b) / 4;
+  r = (pixel.red * AVERAGE_FACTOR + r) / (AVERAGE_FACTOR + 1);
+  g = (pixel.green * AVERAGE_FACTOR + g) / (AVERAGE_FACTOR + 1);
+  b = (pixel.blue * AVERAGE_FACTOR + b) / (AVERAGE_FACTOR + 1);
 
   if (r < 0) r = 0; else if (r > 0xFF) r = 0xFF;
   if (g < 0) g = 0; else if (g > 0xFF) g = 0xFF;
@@ -72,4 +74,18 @@ void avg_color(RGBPixel &pixel,
 void avg_color(RGBPixel &pixel, RGBPixel &newpix)
 {
   avg_color(pixel, newpix.red, newpix.green, newpix.blue);
+}
+
+static void fade_pixel(Adafruit_NeoPixel& strip, RGBPixel* frame, int x, int numPixels) {
+  uint32_t color = strip.getPixelColor((x + 1) % numPixels);
+  avg_color(frame[x], color >> 16 & 0xFF, color >> 8 & 0xFF, color & 0xFF);
+  color = strip.getPixelColor((x - 1) % numPixels);
+  avg_color(frame[x], color >> 16 & 0xFF, color >> 8 & 0xFF, color & 0xFF);
+}
+
+void strip_fade(Adafruit_NeoPixel& strip, RGBPixel* frame) {
+  int numPixels = strip.numPixels();
+  for (int i = 0; i < numPixels; i++) {
+    fade_pixel(strip, frame, i, numPixels);
+  }
 }
