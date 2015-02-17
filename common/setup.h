@@ -11,6 +11,7 @@
 void common_setup(Adafruit_NeoPixel &strip,
        Adafruit_LSM303_Accel_Unified &accel,
        Adafruit_LSM303_Mag_Unified &mag,
-       Adafruit_BMP085_Unified &bmp 
+       Adafruit_BMP085_Unified &bmp,
+       int program_number = 0
 );
 

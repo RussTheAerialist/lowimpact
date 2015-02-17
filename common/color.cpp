@@ -43,6 +43,13 @@ void rgb_3_pulse(RGBPixel &frame0, RGBPixel &frame1, RGBPixel &frame2, uint8_t x
            );
 }
 
+void rgb_pulse(RGBPixel &frame, uint8_t x_delta, uint8_t y_delta, uint8_t z_delta) {
+  avg_color(frame,
+    map_accel(x_delta, 255),
+    map_accel(y_delta, 255),
+    map_accel(z_delta, 255));
+}
+
 void avg_color(RGBPixel &pixel,
                       uint8_t r,
                       uint8_t g,
