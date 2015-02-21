@@ -15,8 +15,11 @@
 ////////////////////////////////////
 
 #define PIN 6
-#define NUM_PIXELS 8
-#define AVERAGE_FACTOR 4
+#define NUM_PIXELS 14
+const int FIRST_PIXEL = NUM_PIXELS / 8.0;
+const int MIDDLE_PIXEL = NUM_PIXELS / 2.0;
+const int LAST_PIXEL = NUM_PIXELS / 8.0 * 7.0;
+#define AVERAGE_FACTOR 2
 
 ////////////////////////////////////
 

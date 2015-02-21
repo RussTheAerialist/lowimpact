@@ -43,7 +43,10 @@ void pulse(int x, sensors_event_t *event, sensors_event_t *avg)
   int8_t y_delta = max(0, event->acceleration.y - avg->acceleration.y/count);
   int8_t z_delta = max(0, event->acceleration.z - avg->acceleration.z/count);
 
-  rgb_3_pulse(frame[x], frame[0], frame[NUM_PIXELS-1],
+  rgb_3_pulse(frame[x], frame[FIRST_PIXEL], frame[LAST_PIXEL],
+    abs(x_delta), abs(y_delta), abs(z_delta)
+    );
+  rgb_3_pulse(frame[x+1], frame[FIRST_PIXEL+1], frame[LAST_PIXEL-1],
     abs(x_delta), abs(y_delta), abs(z_delta)
     );
 
@@ -69,7 +72,7 @@ void loop() {
   mag.getEvent(&mag_event);
 
   if (dof.fusionGetOrientation(event, &mag_event, &orientation)) {
-      pulse(3, &accel_event, &accel_event_avg);
+      pulse(MIDDLE_PIXEL, &accel_event, &accel_event_avg);
 
     which = !which;
 
