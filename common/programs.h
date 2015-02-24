@@ -7,5 +7,6 @@ enum class Programs : uint8_t {
     rgbSingle = 1,
     rgb3Pixel = 2,
     hsvSingle = 3,
-    avgAmbient = 4
+    avgAmbient = 4,
+    avgAmbientThreshold = 5
 };
